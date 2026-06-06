@@ -8,6 +8,25 @@ Agents enter a ZIP code. SnapReport pulls live MLS data, writes a plain-English 
 
 ---
 
+## My Approach
+
+Before writing a single line of code, I used AI to help me think — not to generate code, but to stress-test my understanding of the problem, lock down decisions, and break the work into concrete tasks. I find this makes the actual build significantly faster because there are no surprises mid-way through.
+
+The planning happened in three stages, each captured in a document:
+
+**[`design_decisions.md`](../design_decisions.md) — Design grilling session**
+I gave the AI my initial project brief and invoked a structured "grill me" skill that asked me hard questions about every design decision — one at a time — before I'd written anything. Things like: what happens if the API is down? Why two API calls instead of one? How do you handle LLM hallucinations? Working through these questions upfront meant I went into the build with clear answers, not assumptions.
+
+**[`prd.md`](../prd.md) — Product requirements**
+Once the design decisions were settled, I wrote a PRD to formalise exactly what needed to exist. Functional requirements, non-functional requirements, what was explicitly out of scope, tech choices with reasoning, and the full PDF content spec. Writing this forced me to be precise about the scope — which is what kept the build focused during the hackathon hour.
+
+**[`prd_to_issues.md`](../prd_to_issues.md) — Engineering issue breakdown**
+Finally I broke the PRD into 13 concrete engineering issues, ordered by dependency — you can't build a PDF before you have data, you can't serve the UI before you have the PDF. Each issue had acceptance criteria so I knew exactly when it was done. This is the list I worked through during the actual build.
+
+The actual code was written after all three documents existed. AI helped throughout — but the decisions were mine.
+
+---
+
 ## The Problem
 
 Real estate agents know they should send monthly market updates to their contacts. Almost none do — because pulling data, writing copy, and designing a PDF takes 3–4 hours they don't have. The agents who do it consistently out-earn those who don't.
