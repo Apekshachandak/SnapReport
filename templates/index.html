@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SnapReport — Instant Market Reports | Snaphomz</title>
+  <meta name="description" content="Generate a branded AI-powered real estate market report PDF for any US ZIP code in under 90 seconds." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #1B3F72;
+      --navy-d: #122d55;
+      --gold:   #D4A017;
+      --white:  #ffffff;
+      --grey:   #6B7280;
+      --light:  #EEF2F9;
+      --bg:     #0D1B30;
+      --border: #E5E7EB;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(27,63,114,0.35) 0%, transparent 70%);
+      top: -150px; left: -150px;
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(212,160,23,0.12) 0%, transparent 70%);
+      bottom: -100px; right: -100px;
+      pointer-events: none;
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+      width: 100%;
+      max-width: 560px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: var(--navy);
+      padding: 28px 36px 24px;
+      text-align: center;
+      position: relative;
+    }
+    .card-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--gold);
+    }
+
+    .brand {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+
+    .tagline {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.5;
+    }
+
+    .card-body { padding: 32px 36px 28px; }
+
+    /* ── Form sections ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--grey);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+    }
+    .form-group label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--grey);
+    }
+
+    .input-wrapper { position: relative; }
+    .input-wrapper svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--grey);
+      pointer-events: none;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 11px 12px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      color: var(--navy);
+      background: #FAFAFA;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="text"].zip-field {
+      padding-left: 38px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+    input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(27,63,114,0.1);
+      background: #fff;
+    }
+    input::placeholder { color: #C4C9D4; font-weight: 400; letter-spacing: 0; }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    /* Agent section toggle */
+    .agent-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: 14px;
+    }
+    .agent-toggle input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: var(--navy);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .agent-toggle span {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .agent-toggle .badge {
+      font-size: 10px;
+      background: var(--light);
+      color: var(--navy);
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+
+    #agent-fields { display: none; }
+    #agent-fields.visible { display: block; }
+
+    /* Submit button */
+    button#generate-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(27,63,114,0.3);
+      letter-spacing: 0.02em;
+    }
+    button#generate-btn:hover:not(:disabled) {
+      background: var(--navy-d);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(27,63,114,0.4);
+    }
+    button#generate-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* Loading */
+    #loading {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 0 4px;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--light);
+      border-top-color: var(--navy);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 13px; color: var(--grey); font-weight: 500; }
+    .loading-step { font-size: 11px; color: #9CA3AF; margin-top: 2px; text-align: center; }
+
+    /* Download */
+    #download-btn {
+      display: none;
+      width: 100%;
+      margin-top: 14px;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #16A34A, #15803D);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(22,163,74,0.3);
+      animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    @keyframes popIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
+    #download-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(22,163,74,0.4); }
+
+    /* Error */
+    #error-msg {
+      display: none;
+      margin-top: 12px;
+      padding: 11px 14px;
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #DC2626;
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: flex;
+      justify-content: space-around;
+      padding: 18px 36px;
+      background: var(--light);
+      border-top: 1px solid var(--border);
+    }
+    .stat { text-align: center; }
+    .stat-val { font-size: 18px; font-weight: 800; color: var(--navy); }
+    .stat-lbl { font-size: 10px; color: var(--grey); margin-top: 2px; }
+
+    .footer-note {
+      margin-top: 20px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+      text-align: center;
+      z-index: 1;
+      position: relative;
+    }
+    .footer-note a { color: var(--gold); text-decoration: none; }
+
+    @media (max-width: 500px) {
+      .card-header { padding: 22px 20px 18px; }
+      .card-body { padding: 24px 20px 20px; }
+      .form-row { flex-direction: column; gap: 10px; }
+      h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="brand">Snaphomz</div>
+      <h1>SnapReport</h1>
+      <p class="tagline">Live MLS data · AI narrative · Branded PDF in under 90 seconds</p>
+    </div>
+
+    <div class="card-body">
+      <form id="report-form">
+
+        <!-- ZIP Code -->
+        <div class="section-label">Market ZIP Code</div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <div class="input-wrapper">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            <input
+              type="text"
+              id="zip-input"
+              name="zip"
+              class="zip-field"
+              placeholder="e.g. 90210"
+              maxlength="5"
+              inputmode="numeric"
+              autocomplete="postal-code"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Agent toggle -->
+        <label class="agent-toggle" for="agent-toggle-cb">
+          <input type="checkbox" id="agent-toggle-cb" />
+          <span>Add agent branding to report</span>
+          <span class="badge">Optional</span>
+        </label>
+
+        <div id="agent-fields">
+          <div class="section-label">Agent Information</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="agent_name">Full Name</label>
+              <input type="text" id="agent_name" name="agent_name" placeholder="Sarah Chen" />
+            </div>
+            <div class="form-group">
+              <label for="agent_company">Brokerage</label>
+              <input type="text" id="agent_company" name="agent_company" placeholder="Premier Realty" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="agent_phone">Phone</label>
+              <input type="tel" id="agent_phone" name="agent_phone" placeholder="310-555-0190" />
+            </div>
+            <div class="form-group">
+              <label for="agent_email">Email</label>
+              <input type="email" id="agent_email" name="agent_email" placeholder="sarah@realty.com" />
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" id="generate-btn">Generate Report</button>
+      </form>
+
+      <div id="loading">
+        <div class="spinner"></div>
+        <div>
+          <div class="loading-text">Generating your report...</div>
+          <div class="loading-step" id="loading-step">Fetching live market data...</div>
+        </div>
+      </div>
+
+      <div id="error-msg"></div>
+      <a id="download-btn" href="#" download>Download PDF Report</a>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><div class="stat-val">90s</div><div class="stat-lbl">ZIP to PDF</div></div>
+      <div class="stat"><div class="stat-val">Live</div><div class="stat-lbl">MLS Data</div></div>
+      <div class="stat"><div class="stat-val">AI</div><div class="stat-lbl">Narrative</div></div>
+      <div class="stat"><div class="stat-val">Free</div><div class="stat-lbl">No Cost</div></div>
+    </div>
+  </div>
+
+  <p class="footer-note">
+    Powered by <a href="https://snaphomz.com" target="_blank">Snaphomz</a>
+    &nbsp;·&nbsp; Data: RealEstateAPI.com
+    &nbsp;·&nbsp; AI: Llama 3.3 70B via Groq
+  </p>
+
+  <script>
+    const form        = document.getElementById('report-form');
+    const btn         = document.getElementById('generate-btn');
+    const loading     = document.getElementById('loading');
+    const loadingStep = document.getElementById('loading-step');
+    const errorMsg    = document.getElementById('error-msg');
+    const downloadBtn = document.getElementById('download-btn');
+    const zipInput    = document.getElementById('zip-input');
+    const agentToggle = document.getElementById('agent-toggle-cb');
+    const agentFields = document.getElementById('agent-fields');
+
+    // Digit-only ZIP input
+    zipInput.addEventListener('input', () => {
+      zipInput.value = zipInput.value.replace(/\D/g, '').slice(0, 5);
+    });
+
+    // Toggle agent fields
+    agentToggle.addEventListener('change', () => {
+      agentFields.classList.toggle('visible', agentToggle.checked);
+    });
+
+    const steps = [
+      'Fetching live market data...',
+      'Pulling recent sales comps...',
+      'Writing AI market narrative...',
+      'Rendering branded PDF...',
+      'Almost ready...',
+    ];
+
+    function showLoading() {
+      btn.disabled = true;
+      btn.textContent = 'Generating...';
+      loading.style.display = 'flex';
+      errorMsg.style.display = 'none';
+      downloadBtn.style.display = 'none';
+      let i = 0;
+      return setInterval(() => {
+        loadingStep.textContent = steps[i++ % steps.length];
+      }, 5000);
+    }
+
+    function hideLoading(interval) {
+      clearInterval(interval);
+      loading.style.display = 'none';
+      btn.disabled = false;
+      btn.textContent = 'Generate Report';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const zip = zipInput.value.trim();
+      if (!/^\d{5}$/.test(zip)) {
+        errorMsg.textContent = 'Please enter a valid 5-digit US ZIP code.';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      const interval = showLoading();
+      try {
+        const fd = new FormData(form);
+        const res = await fetch('/generate', { method: 'POST', body: fd });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || `Server error ${res.status}`);
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        downloadBtn.href = url;
+        downloadBtn.download = `snapreport_${zip}.pdf`;
+        downloadBtn.textContent = `Download Report — ZIP ${zip}`;
+        downloadBtn.style.display = 'block';
+        hideLoading(interval);
+      } catch (err) {
+        hideLoading(interval);
+        errorMsg.textContent = err.message || 'Something went wrong. Please try again.';
+        errorMsg.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
