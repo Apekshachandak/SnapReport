@@ -25,6 +25,8 @@ Finally I broke the PRD into 13 concrete engineering issues, ordered by dependen
 
 The actual code was written after all three documents existed. AI helped throughout — but the decisions were mine.
 
+> The skills I used here are ones I built myself — custom instruction files I wrote to shape how the AI asks questions. They're not built-in features; I designed them specifically to help me think through projects more rigorously before building.
+
 ---
 
 ## The Problem
